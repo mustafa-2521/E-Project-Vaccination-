@@ -1,0 +1,18 @@
+<?php
+namespace Database\Seeders;
+use Illuminate\Database\Seeder;
+use App\Models\{User,Vaccine,Hospital,Child,Appointment,VaccinationRecord};
+use Illuminate\Support\Carbon;
+class DatabaseSeeder extends Seeder{public function run():void{
+$admin=User::create(['name'=>'System Administrator','email'=>'admin@vaccine.test','password'=>'password','role'=>'admin','phone'=>'03000000000','address'=>'VaccineCare Head Office']);
+$parent=User::create(['name'=>'Ayesha Khan','email'=>'parent@vaccine.test','password'=>'password','role'=>'parent','phone'=>'03001111111','address'=>'Gulshan-e-Iqbal, Karachi']);
+$child1=Child::create(['parent_id'=>$parent->id,'name'=>'Ayaan Khan','dob'=>Carbon::now()->subYears(3)->subMonths(2)->format('Y-m-d'),'gender'=>'Male','blood_group'=>'B+','guardian_phone'=>$parent->phone,'address'=>$parent->address]);
+$child2=Child::create(['parent_id'=>$parent->id,'name'=>'Hania Khan','dob'=>Carbon::now()->subYears(1)->subMonths(4)->format('Y-m-d'),'gender'=>'Female','blood_group'=>'A+','guardian_phone'=>$parent->phone,'address'=>$parent->address]);
+$v=[];foreach([['BCG','Dose 1',0,'Protects against severe forms of tuberculosis.'],['OPV','Dose 1',0,'Oral polio vaccine.'],['Pentavalent','Dose 1',6,'Routine childhood immunization dose.'],['PCV','Dose 1',6,'Pneumococcal conjugate vaccine.'],['Measles','Dose 1',9,'Routine measles immunization.'],['MMR','Dose 1',12,'Measles, mumps and rubella vaccine.'],['Hepatitis B','Dose 1',0,'Hepatitis B immunization.'],['Rotavirus','Dose 1',2,'Rotavirus immunization.']] as $x)$v[$x[0]]=Vaccine::create(['name'=>$x[0],'dose'=>$x[1],'age_months'=>$x[2],'status'=>'Available','description'=>$x[3]]);
+$hu=User::create(['name'=>'City Care Hospital','email'=>'hospital@vaccine.test','password'=>'password','role'=>'hospital','phone'=>'03002222222','address'=>'University Road, Karachi']);$hospital=Hospital::create(['user_id'=>$hu->id,'name'=>'City Care Hospital','phone'=>$hu->phone,'address'=>$hu->address,'location'=>'University Road, Karachi','license_no'=>'HSP-2026-001','consultation_fee'=>1000,'vaccination_fee'=>1500,'opening_hours'=>'09:00 AM - 09:00 PM','facilities'=>'Child vaccination, cold-chain storage, pediatric consultation','vaccine_status'=>'Available']);
+$hu2=User::create(['name'=>'Noor Medical Centre','email'=>'noor@vaccine.test','password'=>'password','role'=>'hospital','phone'=>'03003333333','address'=>'North Nazimabad, Karachi']);Hospital::create(['user_id'=>$hu2->id,'name'=>'Noor Medical Centre','phone'=>$hu2->phone,'address'=>$hu2->address,'location'=>'North Nazimabad, Karachi','license_no'=>'HSP-2026-002','consultation_fee'=>800,'vaccination_fee'=>1200,'opening_hours'=>'10:00 AM - 08:00 PM','facilities'=>'Vaccination, pediatric consultation, appointment support','vaccine_status'=>'Available']);
+Appointment::create(['child_id'=>$child1->id,'hospital_id'=>$hospital->id,'vaccine_id'=>$v['Measles']->id,'appointment_date'=>Carbon::today()->addDays(3)->format('Y-m-d'),'appointment_time'=>'10:30','status'=>'Approved']);
+Appointment::create(['child_id'=>$child2->id,'hospital_id'=>$hospital->id,'vaccine_id'=>$v['MMR']->id,'appointment_date'=>Carbon::today()->addDays(7)->format('Y-m-d'),'appointment_time'=>'11:15','status'=>'Pending']);
+Appointment::create(['child_id'=>$child1->id,'hospital_id'=>$hospital->id,'vaccine_id'=>$v['BCG']->id,'appointment_date'=>Carbon::today()->subDays(12)->format('Y-m-d'),'appointment_time'=>'09:30','status'=>'Completed']);
+VaccinationRecord::create(['child_id'=>$child1->id,'vaccine_id'=>$v['BCG']->id,'hospital_id'=>$hospital->id,'given_on'=>Carbon::today()->subDays(12)->format('Y-m-d'),'dose_no'=>'Dose 1','status'=>'Vaccinated','remarks'=>'Routine vaccination completed.']);
+}}
